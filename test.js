@@ -10,12 +10,12 @@ async function scrapeRankTable(url) {
     // class가 rank_table인 표를 식별합니다.
     const rankTable = $('table.rank_table');
 
-    // 표에서 데이터 추출
+    // 표에서 a 태그 안의 정보를 추출
     const tableData = [];
     rankTable.find('tr').each((rowIndex, row) => {
       const rowData = [];
-      $(row).find('td').each((colIndex, cell) => {
-        rowData.push($(cell).text().trim()); // .trim()은 공백을 제거합니다.
+      $(row).find('td a').each((colIndex, link) => {
+        rowData.push($(link).text().trim());
       });
       tableData.push(rowData);
     });
@@ -28,5 +28,5 @@ async function scrapeRankTable(url) {
 }
 
 // 크롤링할 웹 페이지의 URL을 지정합니다.
-const url = 'https://maplestory.nexon.com/Common/Guild?gid=402812&wid=0';
+const url = 'https://maplestory.nexon.com/Common/Guild?gid=402812&wid=0&orderby=0&page=1';
 scrapeRankTable(url);
