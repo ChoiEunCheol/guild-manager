@@ -1,29 +1,32 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-async function scrapeCharacterInfo() {
+async function scrapeRankTable(url) {
   try {
-    const url = 'https://maplestory.nexon.com/Common/Guild?gid=402812&wid=0';
     const response = await axios.get(url);
     const html = response.data;
-    
     const $ = cheerio.load(html);
-    
-    // 예제: 캐릭터 이름 가져오기
-    const characterName = $('div.name').text();
-    
-    // 예제: 레벨 가져오기
-    const level = $('div.info li:contains("Level")').text();
-    
-    // 예제: 직업 가져오기
-    const job = $('div.info li:contains("Job")').text();
-    
-    console.log('캐릭터 이름:', characterName);
-    console.log('레벨:', level);
-    console.log('직업:', job);
+
+    // class가 rank_table인 표를 식별합니다.
+    const rankTable = $('table.rank_table');
+
+    // 표에서 데이터 추출
+    const tableData = [];
+    rankTable.find('tr').each((rowIndex, row) => {
+      const rowData = [];
+      $(row).find('td').each((colIndex, cell) => {
+        rowData.push($(cell).text().trim()); // .trim()은 공백을 제거합니다.
+      });
+      tableData.push(rowData);
+    });
+
+    // 데이터 출력
+    console.log('크롤링한 데이터:', tableData);
   } catch (error) {
     console.error('오류 발생:', error);
   }
 }
 
-scrapeCharacterInfo();
+// 크롤링할 웹 페이지의 URL을 지정합니다.
+const url = 'https://maplestory.nexon.com/Common/Guild?gid=402812&wid=0';
+scrapeRankTable(url);
