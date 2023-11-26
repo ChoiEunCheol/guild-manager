@@ -3,7 +3,6 @@ const mariadb = require('mariadb');
 // MariaDB 연결 정보
 const pool = mariadb.createPool({
     host: 'localhost',
-    port: '3307',
     user: 'root',
     password: '0000',
     database: 'guild_manager',
@@ -55,3 +54,4 @@ pool.getConnection()
     .catch((err) => {
         console.error('DB 연결 에러', err);
     });
+
