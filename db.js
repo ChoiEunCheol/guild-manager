@@ -7,7 +7,7 @@ const pool = mariadb.createPool({
     user: 'root',
     password: '0000',
     database: 'guild_manager',
-    connectionLimit: 10, // 동시에 유지될 연결 수
+    connectionLimit: 20, // 동시에 유지될 연결 수
 });
 
 // 배열의 각 요소를 데이터베이스에 저장
