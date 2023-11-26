@@ -6,6 +6,31 @@
     <title>길드 명부</title>
 </head>
 <body>
+    <h1>이미지 OCR</h1>
+    
+    <form id="imageForm" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*" required>
+        <button type="button" onclick="uploadImage()">이미지 업로드</button>
+    </form>
 
+    <script>
+        // 이미지를 서버로 업로드하는 함수
+        function uploadImage() {
+            const form = document.getElementById('imageForm');
+            const formData = new FormData(form);
+
+            fetch('/uploadImage', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(message => {
+                alert(message);
+            })
+            .catch(error => {
+                console.error('이미지 업로드 에러', error);
+            });
+        }
+    </script>
 </body>
 </html>
