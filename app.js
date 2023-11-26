@@ -1,5 +1,7 @@
 const express = require('express');
 const path = require('path');
+const saveMember = require('./db');
+
 const app = express();
 
 const port = 3030; // 사용할 포트 번호
