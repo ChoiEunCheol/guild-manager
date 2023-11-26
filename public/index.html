@@ -1,11 +1,45 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>길드 명부</title>
 </head>
+
 <body>
+
+    <script>
+
+        // 데이터베이스 연결 및 쿼리 함수
+        async function queryDatabase() {
+            try {
+                // 서버에 데이터베이스 쿼리 요청
+                const response = await fetch('/api/getMainMemberData');
+                const data = await response.json();
+
+                // 브라우저에 결과 표시
+                const resultContainer = document.createElement('div');
+                data.forEach(row => {
+                    for (const key in row) {
+                        if (row.hasOwnPrnoperty(key)) {
+                            const keyValue = `${key}: ${row[key]}`;
+                            const entryElement = document.createElement('p');
+                            entryElement.textContent = keyValue;
+                            resultContainer.appendChild(entryElement);
+                        }
+                    }
+                });
+
+                document.body.appendChild(resultContainer);
+            } catch (error) {
+                console.error('Error querying database:', error);
+            }
+        }
+
+        // 페이지 로드 시 데이터베이스 쿼리 실행
+        window.onload = queryDatabase;
+    </script>
 
 </body>
 </html>

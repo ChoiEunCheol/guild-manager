@@ -55,3 +55,35 @@ pool.getConnection()
     .catch((err) => {
         console.error('DB 연결 에러', err);
     });
+
+// --------------------------------------------------
+// 데이터베이스 쿼리 수행 함수
+async function queryDatabase() {
+  let conn;
+  try {
+    // 데이터베이스에 연결
+    conn = await pool.getConnection();
+
+    // main_member 테이블에서 데이터 쿼리
+    const result = await conn.query('SELECT * FROM main_member');
+
+    // 결과를 브라우저에 출력
+    result.forEach(row => {
+      for (const key in row) {
+        if (row.hasOwnProperty(key)) {
+          console.log(`${key}: ${row[key]}`);
+        }
+      }
+    });
+  } catch (err) {
+    throw err;
+  } finally {
+    if (conn) {
+      // 연결 해제
+      conn.release();
+    }
+  }
+}
+
+// 데이터베이스 쿼리 실행
+queryDatabase();
