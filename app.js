@@ -8,7 +8,8 @@ const pool = mariadb.createPool({
   host: 'localhost',
   user: 'root',
   password: '0000',
-  database: 'guild_manager'
+  database: 'guild_manager',
+  connectionLimit: 100,
 });
 
 // public 폴더 내의 정적 파일 (index.html)을 제공
@@ -24,7 +25,13 @@ app.get('/members', async (req, res) => {
     console.error(err);
     res.status(500).send('Internal Server Error');
   } finally {
-    if (conn) conn.release();
+    if (conn) {
+      try {
+        conn.release(); // 연결을 풀에 반환
+      } catch (e) {
+        console.error('Error releasing connection:', e);
+      }
+    }
   }
 });
 
