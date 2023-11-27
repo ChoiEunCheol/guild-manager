@@ -9,7 +9,7 @@ const pool = mariadb.createPool({
   user: 'root',
   password: '0000',
   database: 'guild_manager',
-  connectionLimit: 1000,
+  connectionLimit: 10,
 });
 
 // public 폴더 내의 정적 파일 (index.html)을 제공
