@@ -1,57 +1,37 @@
-const mariadb = require('mariadb');
+const { Sequelize } = require('sequelize');
+const MainMember = require('./models/mainMember.js');
 
-// MariaDB 연결 정보
-const pool = mariadb.createPool({
-    host: 'localhost',
-    port: '3307',
-    user: 'root',
-    password: '0000',
-    database: 'guild_manager',
-    connectionLimit: 10, // 동시에 유지될 연결 수
-});
-
-// 배열의 각 요소를 데이터베이스에 저장
-async function saveMember(characterNames) {
-    let conn;
+async function fetchData() {
+    const sequelize = new Sequelize({
+        dialect: 'mariadb',
+        host: 'localhost',
+        port: '3307',
+        username: 'root',
+        password: '0000',
+        database: 'guild_manager',
+    });
 
     try {
-        conn = await pool.getConnection();
+        // 데이터베이스 연결 확인
+        await sequelize.authenticate();
+        console.log('데이터베이스 연결 성공');
+        
+        // 데이터베이스에 테이블이 없다면 생성
+        await MainMember.sync();
 
-        for (const name of characterNames) {
-            await conn.query('INSERT INTO main_member (name) VALUES (?) ', [name]);
-        }
-
-        console.log('별빛 길드원 저장 성공');
-    } catch (err) {
-        console.error('데이터 저장 에러', err);
+        // 데이터 조회
+        const members = await MainMember.findAll({
+            attributes: ['id', 'name'], // 'id'를 속성에 포함
+            raw: true,  // 반환 데이터를 Sequelize 모델 객체가 아닌 순수 JSON 객체로 변경
+        });
+        console.log('조회 결과: ', members);
+    } catch (error) {
+        console.error('데이터베이스 조회 에러: ', error);
     } finally {
-        if (conn) {
-            conn.release(); // 연결 반환!
-        }
+        // sequelize.close();  // close 메서드는 더이상 필요하지 않습니다.
+        console.log('데이터베이스 연결 종료');
     }
 }
 
-module.exports = saveMember;
-
-// MariaDB 연결 풀에서 연결
-pool.getConnection()
-    .then((conn) => {
-        console.log('MariaDB에 연결됨');
-
-        // 쿼리 실행 또는 다른 작업 수행
-        conn.query('SELECT * FROM main_member')
-            .then((rows) => {
-                console.log(rows);  // 쿼리 결과 출력
-            })
-            .catch((err) => {
-                console.error('쿼리 에러', err);
-            })
-            .finally(() => {
-                // 연결 반환
-                conn.release();
-                console.log('연결 반환');
-            });
-    })
-    .catch((err) => {
-        console.error('DB 연결 에러', err);
-    });
+// 데이터 조회 함수 실행
+fetchData();
