@@ -6,6 +6,23 @@
     <title>길드 명부</title>
 </head>
 <body>
-
+    <h1>Member List</h1>
+    <ul id="memberList"></ul>
+  
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        fetch('/members')
+          .then(response => response.json())
+          .then(data => {
+            const memberList = document.getElementById('memberList');
+            data.forEach(member => {
+              const listItem = document.createElement('li');
+              listItem.textContent = `${member.member_id}: ${member.member_name}`;
+              memberList.appendChild(listItem);
+            });
+          })
+          .catch(error => console.error('Error fetching data:', error));
+      });
+    </script>
 </body>
 </html>
