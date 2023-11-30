@@ -6,10 +6,7 @@ const imagePath = "./TestImage.png";
 // Tesseract.js로 텍스트 추출
 Tesseract.recognize(
   imagePath, // 이미지 파일 경로
-  'kor', // 언어 코드 (영어인 경우 'eng')
-  {
-    logger: info => console.log(info), // 로그 출력
-  }
+  'kor+eng', // 언어 코드 (영어인 경우 'eng')
 ).then(({ data: { text } }) => {
   console.log('추출된 텍스트:', text);
 }).catch(error => {
