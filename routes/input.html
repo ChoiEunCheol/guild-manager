@@ -1,0 +1,32 @@
+<form action="/input/addMembers" method="post" id="memberForm">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name">
+    <button type="button" onclick="addName()">Add Name</button>
+    <button type="submit">Add Members</button>
+    <ul id="nameList"></ul>
+    <input type="hidden" id="namesInput" name="names" value="">
+  </form>
+  <script>
+    // JavaScript 코드는 이곳에 작성
+    let namesArray = [];
+  
+    function addName() {
+      const nameInput = document.getElementById('name');
+      const name = nameInput.value.trim();
+  
+      if (name !== '') {
+        namesArray.push(name);
+        nameInput.value = '';
+  
+        const nameList = document.getElementById('nameList');
+        const listItem = document.createElement('li');
+        listItem.textContent = name;
+        nameList.appendChild(listItem);
+      }
+    }
+  
+    document.getElementById('memberForm').addEventListener('submit', function (event) {
+      const namesInput = document.getElementById('namesInput');
+      namesInput.value = JSON.stringify(namesArray);
+    });
+  </script>
