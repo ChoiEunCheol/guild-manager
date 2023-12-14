@@ -1,0 +1,23 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+#header{
+    height: 63px;
+
+    background-color: antiquewhite;
+}
+
+#body{
+    display: flex;
+    height: 100px;
+}
+
+#sideMenu{
+    width: 240px;
+    height: inherit;
+
+    background-color: aqua;
+}
