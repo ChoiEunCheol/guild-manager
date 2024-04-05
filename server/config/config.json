@@ -1,14 +1,14 @@
 {
   "development": {
     "username": "root",
-    "password": "123123123",
+    "password": "10041004",
     "database": "database_for_guild",
     "host": "database-for-guild.clewymu6ct5n.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mariadb"
   },
   "test": {
     "username": "root",
-    "password": "123123123",
+    "password": "10041004",
     "database": "database_for_guild",
     "host": "database-for-guild.clewymu6ct5n.ap-northeast-2.rds.amazonaws.com",
     "dialect": "mariadb"
