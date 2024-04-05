@@ -4,7 +4,7 @@ import dayjs, { Dayjs } from 'dayjs';
 import SelectWeek from "./components/SelectWeek";
 import { useParams } from "react-router-dom";
 import Modal from "../../components/Modal";
-import { Grid, Box, Typography, TextField, Select, MenuItem, Button, IconButton } from "@mui/material";
+import { Grid, Box, Typography, TextField, Select, MenuItem, Button, IconButton, CircularProgress } from "@mui/material";
 import InfoIcon from "@mui/icons-material/Info";
 import HomePageInstructions from "./components/AdminpageManual";
 import getCurrentWeek from "./components/getCurrentWeek";
@@ -69,11 +69,15 @@ const Adminpage: React.FC = () => {
   const [tableData, setTableData] = useState<TableRowData[]>([]);
   const [isEditMode, setIsEditMode] = useState<boolean>(false);
   const [editedData, setEditedData] = useState<TableRowData[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs().subtract(1, 'day'));
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   // selectedDate를 yyyy-WWW 형식으로 포맷팅하는 함수
   const getFormattedDate = () => {
+    const weekNumber = selectedDate?.day() === 0
+      ? selectedDate.subtract(1, 'day').week()
+      : selectedDate?.week();
+
     return selectedDate
-      ? `${selectedDate.year()}-W${selectedDate.week().toString().padStart(2, '0')}`
+      ? `${selectedDate.year()}-W${weekNumber?.toString().padStart(2, '0')}`
       : '';
   };
   const [selectedRowIds, setSelectedRowIds] = useState<number[]>([]);
@@ -91,6 +95,7 @@ const Adminpage: React.FC = () => {
   const [suroScoreTotal, setSuroScoreTotal] = useState(0);
   const [flagScoreTotal, setFlagScoreTotal] = useState(0);
   const [isHidden, setIsHidden] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const toggleDisplay = () => {
     setIsHidden(!isHidden);
   };
@@ -385,14 +390,20 @@ const Adminpage: React.FC = () => {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files) {
-      const filesArray = Array.from(event.target.files).slice(0, 15); // 최대 15개 파일 선택
-      setSelectedFiles(filesArray);
-      console.log("선택된 파일들:", filesArray);
-
+      const filesArray = Array.from(event.target.files).filter(file => 
+        file.name.endsWith('.jpeg') || file.name.endsWith('.jpg') || file.name.endsWith('.png')
+      );
+  
+      if (filesArray.length !== event.target.files.length) {
+        alert("JPEG 또는 PNG 파일만 업로드할 수 있습니다.");
+        return; // 비허용 파일 포함 시 함수 종료
+      }
+  
       // 파일 선택 후 자동으로 업로드 실행
       handleUploadFiles(filesArray);
     }
   };
+  
 
   // 컴포넌트 내부에서
   const fileInputRef = useRef<HTMLInputElement>(null); // TypeScript 타입 지정
@@ -406,11 +417,12 @@ const Adminpage: React.FC = () => {
 
   // 파일 서버로 전송
   const handleUploadFiles = (files: File[]) => {
+    setIsLoading(true); // 로딩 시작
     const formData = new FormData();
     files.forEach((file) => {
       formData.append("files", file);
     });
-
+  
     fetch("/uploadImages", {
       method: "POST",
       body: formData,
@@ -425,7 +437,8 @@ const Adminpage: React.FC = () => {
       .catch((error) => {
         console.error("업로드 실패:", error);
         alert("파일 업로드 실패.");
-      });
+      })
+      .finally(() => setIsLoading(false)); // 로딩 종료
   };
 
   // 문자열을 숫자로 변환하는 함수
@@ -733,6 +746,13 @@ const Adminpage: React.FC = () => {
           초기화
         </Button>
       </div>
+      {
+  isLoading && (
+    <div style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0, 0, 0, 0.5)", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <CircularProgress />
+    </div>
+  )
+}
 
       <div
         className={styles.tableInfoContainer}
@@ -764,7 +784,7 @@ const Adminpage: React.FC = () => {
             style={{ display: "none" }}
             multiple
             onChange={handleFileSelect}
-            accept="image/*"
+            accept=".jpeg, .jpg, .png"
             ref={fileInputRef} // React Ref 사용
           />
         </>
