@@ -16,13 +16,6 @@ import {
   ChartData,
 } from "chart.js";
 
-interface ScoreData {
-  week: string;
-  weekly_score: number;
-  suro_score: number;
-  flag_score: number;
-}
-
 // Line 차트에 필요한 요소들을 등록합니다.
 ChartJS.register(
   CategoryScale,
@@ -81,43 +74,38 @@ const Chart = () => {
     window.scrollTo(0, 0); // 페이지 로드 시 스크롤을 최상단으로 이동
     const fetchData = async () => {
       try {
-        const response = await axios.get<ScoreData[]>(`/Graphpage/${memberName}`);
+        const response = await axios.get(`/Graphpage/${memberName}`);
         const data = response.data;
-    
-        const sortedData = data.sort((a, b) => {
-          const weekA = a.week.split("-W");
-          const weekB = b.week.split("-W");
-          const yearA = parseInt(weekA[0], 10);
-          const yearB = parseInt(weekB[0], 10);
-          const weekNumA = parseInt(weekA[1], 10);
-          const weekNumB = parseInt(weekB[1], 10);
-    
-          if (yearA !== yearB) {
-            return yearA - yearB;
-          } else {
-            return weekNumA - weekNumB;
+
+        // 데이터를 week 기준으로 오름차순 정렬
+        const sortedData = data.sort(
+          (a: { week: string }, b: { week: string }) => {
+            const weekA = a.week.split("-W");
+            const weekB = b.week.split("-W");
+            const yearA = parseInt(weekA[0], 10);
+            const yearB = parseInt(weekB[0], 10);
+            const weekNumA = parseInt(weekA[1], 10);
+            const weekNumB = parseInt(weekB[1], 10);
+
+            if (yearA !== yearB) {
+              return yearA - yearB;
+            } else {
+              return weekNumA - weekNumB;
+            }
           }
-        });
-    
-        const weeks: string[] = [];
-        const weeklyScores: number[] = [];
-        const suroScores: number[] = [];
-        const flagScores: number[] = [];
-    
-        // 값이 0이 아닌 경우에만 데이터 추가
-        sortedData.forEach(item => {
-          if (item.weekly_score !== 0) {
-            weeks.push(item.week);
-            weeklyScores.push(item.weekly_score);
-          }
-          if (item.suro_score !== 0) {
-            suroScores.push(item.suro_score);
-          }
-          if (item.flag_score !== 0) {
-            flagScores.push(item.flag_score);
-          }
-        });
-    
+        );
+        const weeks = sortedData.map((item: { week: any }) => item.week);
+        const weeklyScores = sortedData.map(
+          (item: { weekly_score: any }) => item.weekly_score
+        );
+        const suroScores = sortedData.map(
+          (item: { suro_score: any }) => item.suro_score
+        );
+        const flagScores = sortedData.map(
+          (item: { flag_score: any }) => item.flag_score
+        );
+
+        // 주간 점수 데이터 설정
         setWeeklyScoreData({
           labels: weeks,
           datasets: [
@@ -130,7 +118,8 @@ const Chart = () => {
             },
           ],
         });
-    
+
+        // 수로 점수 데이터 설정
         setSuroScoreData({
           labels: weeks,
           datasets: [
@@ -143,7 +132,8 @@ const Chart = () => {
             },
           ],
         });
-    
+
+        // 플래그 점수 데이터 설정
         setFlagScoreData({
           labels: weeks,
           datasets: [
@@ -234,5 +224,5 @@ const Chart = () => {
   );
   
 };
- 
+
 export default Chart;
